@@ -1,0 +1,81 @@
+<div class="client-dashboard">
+  <h2>Your Devices</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Address</th>
+        <th>Max Hourly Consumption</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let device of devices">
+        <td>{{ device.id }}</td>
+        <td>{{ device.description }}</td>
+        <td>{{ device.address }}</td>
+        <td>{{ device.maxhourlyenergyconsumption }}</td>
+        <td>
+          <button (click)="viewChart(device.id)">View Chart</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div>
+    <!-- Date Picker to select the day -->
+    <input type="date" (change)="onDateChange($event)" />
+  </div>
+
+  <!-- Show the chart only when showChart is true -->
+  <div *ngIf="showChart" style="margin-top: 20px;">
+    <canvas id="energyChart"></canvas>
+  </div>
+</div>
+
+<!-- <table>
+  <thead>
+    <tr>
+      <th>Sender</th>
+      <th>Message</th>
+      <th>Response</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let message of messages">
+      <td>{{ message.senderId }}</td>
+      <td>{{ message.message }}</td>
+      <td>
+        <textarea [(ngModel)]="message.tempResponse" placeholder="Type your response here..."></textarea>
+      </td>
+      <td>
+        <button (click)="respondToMessage(message.senderId, message.receiverId, message.tempResponse)">Send Response</button>
+      </td>
+    </tr>
+  </tbody>
+</table> -->
+
+<div class="client-dashboard">
+  <h2>Client Dashboard</h2>
+
+  <!-- User List -->
+  <div class="user-list">
+    <h3>Users</h3>
+    <ul>
+      <li *ngFor="let user of users" (click)="selectUserForChat(user)" [class.selected]="selectedUser?.id === user.id">
+        {{ user.name }}
+      </li>
+    </ul>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-container" *ngIf="selectedUser">
+    <h3>Chat with {{ selectedUser.name }}</h3>
+    <app-chat
+      [loggedInUserId]="loggedInUserId"
+      [selectedUserId]="selectedUser.id.toString()"
+    ></app-chat>
+  </div>
+</div>
+

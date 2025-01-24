@@ -1,0 +1,7 @@
+<!-- energy-consumption.component.html -->
+<h3>Historical Energy Consumption</h3>
+
+<label for="selectedDate">Select Date:</label>
+<input type="date" id="selectedDate" (change)="onDateChange($event)" />
+
+<canvas id="energyChart" width="400" height="200"></canvas>

@@ -1,0 +1,5 @@
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY target/UserManagement-0.0.1-SNAPSHOT.jar /app/backend_users.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "backend_users.jar"]

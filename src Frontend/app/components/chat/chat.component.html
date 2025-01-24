@@ -1,0 +1,36 @@
+<div class="chat-container">
+  <div class="messages">
+    <!-- Display messages -->
+    <div *ngFor="let message of messages" 
+         [ngClass]="{
+           'sent': message.senderId === loggedInUserId,
+           'received': message.receiverId === loggedInUserId
+         }">
+      <p>{{ message.message }}</p>
+      <!-- Display seen status -->
+      <span *ngIf="message.tempResponse == 'SEEN'" class="seen-status">✔️ Seen</span>
+    </div>
+    
+    <!-- Typing indicator -->
+    <div *ngIf="typingIndicatorVisible" class="typing-indicator">
+      <p>{{ typingMessage }}</p>
+    </div>
+    
+    <div *ngIf="typingNotification">
+      <p>{{ typingNotification.receiverId }} is typing...</p>
+    </div>
+  </div>
+
+  <!-- Input message -->
+  <div class="input-container">
+    <input
+      type="text"
+      [(ngModel)]="newMessage"
+      placeholder="Type a message..."
+      (keyup)="onKeyUp($event)"
+      (keydown.enter)="sendMessage()" />
+    <button (click)="sendMessage()">Send</button>
+    <button *ngIf="isAdmin" (click)="sendBroadcastMessageButton()">Send to All Users</button>
+  </div>
+  
+</div>

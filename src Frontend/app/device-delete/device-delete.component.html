@@ -1,0 +1,17 @@
+<div class="device-delete-container">
+    <h2>Delete Device</h2>
+  
+    <p *ngIf="newDevice.name; else noDevice">
+      Are you sure you want to delete the device: <strong>{{ newDevice.name }}</strong>?
+    </p>
+    
+    <ng-template #noDevice>
+      <p>Device not found.</p>
+    </ng-template>
+  
+    <div class="action-buttons">
+      <button (click)="deleteDevice()" class="delete-btn" [disabled]="!newDevice.name">Delete</button>
+      <button (click)="cancel()" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+  

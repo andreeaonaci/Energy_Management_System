@@ -1,0 +1,194 @@
+# version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.8
+    container_name: traefik
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --log.level=DEBUG
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+      - "--entryPoints.web.address=:80"
+      - --providers.docker.exposedbydefault=false
+    ports:
+      - "80:80"
+      - "8089:8089"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
+      - ./traefik_logs:/var/log/traefik
+    networks:
+      - app-network
+
+  devices-backend:
+    build:
+      context: ./Energy_System_Management
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+    # ports:
+    #   - "8081:8081"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.devices-backend.rule=Host(`devices.localhost`)"
+      - "traefik.http.routers.devices-backend.entrypoints=web"
+      - "traefik.http.services.devices-backend.loadbalancer.server.port=8081"
+      - "traefik.http.services.devices-backend.loadbalancer.server.scheme=http" 
+    depends_on:
+      - db_devices
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db_devices:3306/devices_energy_management?autoReconnect=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: '@Andreea03'
+
+  users-backend:
+    build:
+      context: ./UserManagement
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+    # ports:
+    #   - "8080:8080"
+    deploy:
+      replicas: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.users-backend.rule=Host(`users.localhost`)"
+      # - "traefik.http.middlewares.strip-login-prefix.stripPrefix.prefixes=/login"
+      # - "traefik.http.routers.users-backend.middlewares=strip-login-prefix"
+      - "traefik.http.routers.users-backend.entrypoints=web"
+      - "traefik.http.services.users-backend.loadbalancer.server.port=8080"
+      - "traefik.http.services.users-backend.loadbalancer.server.scheme=http" 
+    depends_on:
+      - db_users
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db_users:3306/users_energy_management?autoReconnect=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: '@Andreea03'
+  
+  communication_backend:
+    build:
+      context: ./Communication_A2
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+    # ports:
+    #   - "8082:8082"
+    deploy:
+      replicas: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.communication_backend.rule=Host(`communication.localhost`)"
+      - "traefik.http.routers.communication_backend.entrypoints=web"
+      - "traefik.http.services.communication_backend.loadbalancer.server.port=8082"
+      - "traefik.http.services.communication_backend.loadbalancer.server.scheme=http" 
+    depends_on:
+      - db_communication
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db_communication:3306/monitoring_db?autoReconnect=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: '@Andreea03'
+  
+  chat_backend:
+    build:
+      context: ./ChatMicroservice
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+    # deploy:
+    #   replicas: 1
+    ports:
+      - "8085:8085"
+    depends_on:
+      - db_chat
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chat_backend.rule=Host(`chat.localhost`)"
+      - "traefik.http.routers.chat_backend.entrypoints=web"
+      - "traefik.http.services.chat_backend.loadbalancer.server.port=8085"
+      - "traefik.http.services.chat_backend.loadbalancer.server.scheme=http" 
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db_chat:3306/chat_db?autoReconnect=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: '@Andreea03'
+
+  frontend:
+    build:
+      context: ./ds-app
+      dockerfile: Dockerfile
+    # deploy:
+    #   replicas: 1
+    ports:
+      - "4200:4200"
+    networks:
+      - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=4200"
+      - "traefik.http.services.frontend.loadbalancer.server.scheme=http" 
+
+  db_users:
+    image: mysql:latest
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_DATABASE: users_energy_management
+      MYSQL_ROOT_PASSWORD: '@Andreea03'
+    volumes:
+      - users_data:/var/lib/mysql
+    networks:
+      - app-network
+  
+  db_chat:
+    image: mysql:latest
+    ports:
+      - "3304:3306"
+    environment:
+      MYSQL_DATABASE: chat_db
+      MYSQL_ROOT_PASSWORD: '@Andreea03'
+    volumes:
+      - chat_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  db_devices:
+    image: mysql:latest
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: devices_energy_management
+      MYSQL_ROOT_PASSWORD: '@Andreea03'
+    volumes:
+      - devices_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  db_communication:
+    image: mysql:latest
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_DATABASE: monitoring_db
+      MYSQL_ROOT_PASSWORD: '@Andreea03'
+    volumes:
+      - communication_data:/var/lib/mysql
+    networks:
+      - app-network
+  
+networks:
+  app-network:
+    driver: bridge
+  web:
+    external: true
+
+volumes:
+  users_data:
+  devices_data:
+  communication_data:
+  chat_data:

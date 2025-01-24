@@ -1,0 +1,7 @@
+<h2>Update Device</h2>
+<form *ngIf="selectedDevice" (ngSubmit)="updateDevice()">
+  <input type="text" [(ngModel)]="selectedDevice.name" placeholder="Device Name" required />
+  <input type="text" [(ngModel)]="selectedDevice.description" placeholder="Device Type" required />
+  <button type="submit">Update Device</button>
+</form>
+<div *ngIf="errorMessage">{{ errorMessage }}</div>

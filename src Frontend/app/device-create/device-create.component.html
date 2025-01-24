@@ -1,0 +1,8 @@
+<h2>Create Device</h2>
+<form (ngSubmit)="createDevice()">
+  <input type="text" [(ngModel)]="newDevice.name" placeholder="Device Name" required />
+  <input type="text" [(ngModel)]="newDevice.description" placeholder="Device Type" required />
+  <button type="submit">Create Device</button>
+</form>
+<div *ngIf="errorMessage">{{ errorMessage }}</div>
+

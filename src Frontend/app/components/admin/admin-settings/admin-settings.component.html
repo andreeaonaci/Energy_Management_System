@@ -1,0 +1,26 @@
+<div class="admin-settings">
+    <h1>Admin Settings</h1>
+  
+    <form (ngSubmit)="saveSettings()">
+      <div class="form-group">
+        <label for="siteTitle">Site Title</label>
+        <input type="text" id="siteTitle" name="siteTitle" class="form-control">
+      </div>
+  
+      <div class="form-group">
+        <label for="theme">Theme</label>
+        <select id="theme" name="theme" class="form-control">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+  
+      <div class="form-group">
+        <label for="notifications">Enable Notifications</label>
+        <input type="checkbox" id="notifications" name="notifications">
+      </div>
+  
+      <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
+  </div>
+  

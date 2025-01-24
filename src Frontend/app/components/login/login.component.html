@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Energy Management System</title>
+  <link rel="stylesheet" href="login.component.scss"> 
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+          <h2>Login to Energy Management System</h2>
+          <form [formGroup]="loginForm" (ngSubmit)="login()">
+            <div class="input-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" formControlName="username" placeholder="Enter your username" required>
+            </div>
+            <div class="input-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" formControlName="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn">Login</button>
+          </form>
+          <p id="errorMessage" class="error-message">{{ errorMessage }}</p>
+        </div>
+      </div>
+</body>
+</html>
